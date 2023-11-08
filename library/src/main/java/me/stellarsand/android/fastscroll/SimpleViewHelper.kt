@@ -20,6 +20,7 @@ import android.graphics.Canvas
 import android.view.MotionEvent
 
 abstract class SimpleViewHelper : FastScroller.ViewHelper {
+    
     private var mOnPreDrawListener: Runnable? = null
     private var mOnScrollChangedListener: Runnable? = null
     private var mOnTouchEventListener: Predicate<MotionEvent>? = null

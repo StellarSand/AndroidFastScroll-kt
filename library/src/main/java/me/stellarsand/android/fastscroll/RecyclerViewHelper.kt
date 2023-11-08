@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2023-present StellarSand
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,13 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
 import java.util.Objects
 
-internal class RecyclerViewHelper(private val mView: RecyclerView,
-                                  private val mPopupTextProvider: PopupTextProvider?) :
-    FastScroller.ViewHelper {
+internal class RecyclerViewHelper(
+    private val mView: RecyclerView,
+    private val mPopupTextProvider: PopupTextProvider?
+) : FastScroller.ViewHelper {
+    
     private val mTempRect = Rect()
+    
     override fun addOnPreDrawListener(onPreDraw: Runnable) {
         mView.addItemDecoration(object : ItemDecoration() {
             override fun onDraw(canvas: Canvas, parent: RecyclerView,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2023-present StellarSand
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.util.Consumer
+
 object PopupStyles {
+    
     var DEFAULT = Consumer { popupView: TextView ->
         val resources = popupView.resources
         val minimumSize = resources.getDimensionPixelSize(R.dimen.afs_popup_min_size)
@@ -44,6 +46,7 @@ object PopupStyles {
         popupView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(
             R.dimen.afs_popup_text_size).toFloat())
     }
+    
     var MD2 = Consumer { popupView: TextView ->
         val resources = popupView.resources
         popupView.minimumWidth = resources.getDimensionPixelSize(

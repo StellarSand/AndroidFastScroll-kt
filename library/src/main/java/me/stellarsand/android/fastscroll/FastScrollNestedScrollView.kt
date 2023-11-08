@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2023-present StellarSand
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.annotation.AttrRes
 import androidx.core.widget.NestedScrollView
+
 @SuppressLint("MissingSuperCall")
 abstract class FastScrollNestedScrollView (
     context: Context,
@@ -53,7 +54,7 @@ abstract class FastScrollNestedScrollView (
         return mViewHelper.onTouchEvent(event)
     }
     
-    private inner class ViewHelper(override val scrollX: Int = this@FastScrollNestedScrollView.scrollX) : SimpleViewHelper() {
+    private inner class ViewHelper : SimpleViewHelper() {
         
         override fun addOnPreDrawListener(onPreDraw: Runnable) {
         }
@@ -92,6 +93,9 @@ abstract class FastScrollNestedScrollView (
         override fun computeVerticalScrollOffset(): Int {
             return this@FastScrollNestedScrollView.computeVerticalScrollOffset()
         }
+    
+        override val scrollX: Int
+            get() = this@FastScrollNestedScrollView.scrollX
         
         override fun scrollTo(x: Int, y: Int) {
             this@FastScrollNestedScrollView.scrollTo(x, y)

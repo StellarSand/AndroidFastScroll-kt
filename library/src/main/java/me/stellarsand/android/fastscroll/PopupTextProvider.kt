@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2023-present StellarSand
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package me.stellarsand.android.fastscroll
 
 import android.view.View
+
 interface PopupTextProvider {
     fun getPopupText(view: View, position: Int): CharSequence
 }

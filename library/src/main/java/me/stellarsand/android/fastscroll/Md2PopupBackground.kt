@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2023-present StellarSand
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import android.os.Build
 import android.view.View
 import androidx.core.graphics.drawable.DrawableCompat
 import kotlin.math.sqrt
+
 internal class Md2PopupBackground(context: Context) : Drawable() {
     private val mPaint: Paint = Paint()
     private val mPaddingStart: Int
@@ -39,9 +40,7 @@ internal class Md2PopupBackground(context: Context) : Drawable() {
     
     init {
         mPaint.isAntiAlias = true
-        mPaint.color =
-            Utils.getColorFromAttrRes(android.R.attr.colorControlActivated,
-                                      context)
+        mPaint.color = Utils.getColorFromAttrRes(android.R.attr.colorControlActivated, context)
         mPaint.style = Paint.Style.FILL
         val resources = context.resources
         mPaddingStart = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_padding_start)
@@ -104,6 +103,14 @@ internal class Md2PopupBackground(context: Context) : Drawable() {
         mPath.transform(mTempMatrix)
     }
     
+    companion object {
+        private fun pathArcTo(path: Path, centerX: Float, centerY: Float, radius: Float,
+                              startAngle: Float, sweepAngle: Float) {
+            path.arcTo(centerX - radius, centerY - radius, centerX + radius, centerY + radius,
+                       startAngle, sweepAngle, false)
+        }
+    }
+    
     override fun getPadding(padding: Rect): Boolean {
         if (needMirroring()) {
             padding[mPaddingEnd, 0, mPaddingStart] = 0
@@ -125,11 +132,4 @@ internal class Md2PopupBackground(context: Context) : Drawable() {
         outline.setConvexPath(mPath)
     }
     
-    companion object {
-        private fun pathArcTo(path: Path, centerX: Float, centerY: Float, radius: Float,
-                              startAngle: Float, sweepAngle: Float) {
-            path.arcTo(centerX - radius, centerY - radius, centerX + radius, centerY + radius,
-                       startAngle, sweepAngle, false)
-        }
-    }
 }
