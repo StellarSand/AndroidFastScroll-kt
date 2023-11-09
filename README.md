@@ -68,7 +68,7 @@ class RvAdapter(
     // .... other code ....
     
     override fun getPopupText(view: View, position: Int): CharSequence {
-        return aListViewItems[position].name.substring(0, 1)
+        return aListViewItems[position].title.substring(0, 1)
     }
 
 }
