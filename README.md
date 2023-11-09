@@ -7,7 +7,7 @@ Fast scroll for Android `RecyclerView`.
 
 
 ## Contents
-- [Why AndroidFastScroll-kt](#why-androidfastscroll-kt)
+- [Why AndroidFastScroll-kt?](#why-androidfastscroll-kt)
 - [Preview](#preview)
 - [Integration](#integration)
 - [Usage](#usage)
@@ -17,7 +17,7 @@ Fast scroll for Android `RecyclerView`.
 
 ## Why AndroidFastScroll-kt?
 - Fully customizable: Override track, thumb, popup, animation and scrolling.
-- Easy-to-use defaults: Predefined default style, Material Design 2 style and animation.
+- Easy-to-use defaults: Predefined default style, Material Design 1 style and animation.
 - Extensive view support: Out-of-box support for `RecyclerView`, `ScrollView`, `NestedScrollView` and `WebView`, plus any view with a `ViewHelper` implementation.
 - Window insets friendly: Support setting a separate padding for scrollbar.
 - Clean implementation: Decoupled touch handling, animation and scrolling logic.
@@ -25,8 +25,8 @@ Fast scroll for Android `RecyclerView`.
 
 
 ## Preview
-<p><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="49%" />
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="49%" /></p>
+<p><img src="preview/default_style.png" width="40%" />
+<img src="preview/MD1_style.png" width="40%" /></p>
 
 
 
@@ -60,6 +60,8 @@ class RvAdapter(
     private val aListViewItems: ArrayList<RvData>
 ): RecyclerView.Adapter<RvAdapter.ListViewHolder>(), PopupTextProvider {
     
+    // .... other code ....
+    
     override fun getPopupText(view: View, position: Int): CharSequence {
         return aListViewItems[position].name.substring(0, 1)
     }
@@ -75,7 +77,7 @@ class RvAdapter(
     - `setPopupStyle()` - allows customizing the popup view with a lambda that will receive the view.
     - `setAnimationHelper()` - allows providing a custom `AnimationHelper` to use an alternative scrollbar animation.
     - `disableScrollbarAutoHide()` - allows disabling the auto hide animation for scrollbar. This implies using a `DefaultAnimationHelper`.
-    - `useDefaultStyle()` and `useMd2Style()` - allow using the predefined styles, which sets the drawables and popup style. `useDefaultStyle()`, as its name suggests, is the default style when a `FastScrollerBuilder` is created.
+    - `useDefaultStyle()` and `useMd1Style()` - allow using the predefined styles, which sets the drawables and popup style. `useDefaultStyle()`, as its name suggests, is the default style when a `FastScrollerBuilder` is created.
 
 - The default `ViewHelper` implementation for `RecyclerView` supports both `LinearLayoutManager` and `GridLayoutManager`, but assumes that each item has the same height when calculating scroll, as there's no common way to deal with variable item height. If you know how to measure for scrolling in your specific case, you can provide your own `ViewHelper` implementation and fast scroll will work correctly again.
 

@@ -86,27 +86,27 @@ class FastScrollerBuilder(private val mView: ViewGroup) {
         return this
     }
     
-    fun useDefaultStyle(): FastScrollerBuilder {
+    fun useMd1Style(): FastScrollerBuilder {
         val context = mView.context
-        mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_track,
+        mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_track,
                                                                android.R.attr.colorControlNormal,
                                                                context) !!
-        mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_thumb,
+        mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_thumb,
                                                                android.R.attr.colorControlActivated,
                                                                context) !!
-        mPopupStyle = PopupStyles.DEFAULT
+        mPopupStyle = PopupStyles.MD1
         return this
     }
     
-    fun useMd2Style(): FastScrollerBuilder {
+    fun useDefaultStyle(): FastScrollerBuilder {
         val context = mView.context
-        mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md2_track,
+        mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_default_track,
                                                                android.R.attr.colorControlNormal,
                                                                context) !!
-        mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md2_thumb,
+        mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_default_thumb,
                                                                android.R.attr.colorControlActivated,
                                                                context) !!
-        mPopupStyle = PopupStyles.MD2
+        mPopupStyle = PopupStyles.DEFAULT
         return this
     }
     

@@ -27,41 +27,45 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 
-internal object Utils {
+internal class Utils {
     
-    @ColorInt
-    fun getColorFromAttrRes(@AttrRes attrRes: Int, context: Context): Int {
-        val colorStateList = getColorStateListFromAttrRes(attrRes, context)
-        return colorStateList?.defaultColor ?: 0
-    }
+    companion object {
     
-    fun getColorStateListFromAttrRes(@AttrRes attrRes: Int,
-                                     context: Context): ColorStateList? {
-        val a = context.obtainStyledAttributes(intArrayOf(attrRes))
-        val resId: Int
-        return try {
-            resId = a.getResourceId(0, 0)
-            if (resId != 0) {
-                AppCompatResources.getColorStateList(context, resId)
+        @ColorInt
+        fun getColorFromAttrRes(@AttrRes attrRes: Int, context: Context): Int {
+            val colorStateList = getColorStateListFromAttrRes(attrRes, context)
+            return colorStateList?.defaultColor ?: 0
+        }
+    
+        fun getColorStateListFromAttrRes(@AttrRes attrRes: Int,
+                                         context: Context): ColorStateList? {
+            val a = context.obtainStyledAttributes(intArrayOf(attrRes))
+            val resId: Int
+            return try {
+                resId = a.getResourceId(0, 0)
+                if (resId != 0) {
+                    AppCompatResources.getColorStateList(context, resId)
+                }
+                else a.getColorStateList(0)
             }
-            else a.getColorStateList(0)
+            finally {
+                a.recycle()
+            }
         }
-        finally {
-            a.recycle()
-        }
-    }
     
-    // Work around the bug that GradientDrawable didn't actually implement tinting until
-    // Lollipop MR1 (API 22).
-    fun getGradientDrawableWithTintAttr(@DrawableRes drawableRes: Int,
-                                        @AttrRes tintAttrRes: Int,
-                                        context: Context): Drawable? {
-        var drawable = AppCompatResources.getDrawable(context, drawableRes)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1
-            && drawable is GradientDrawable) {
-            drawable = DrawableCompat.wrap(drawable)
-            drawable.setTintList(getColorStateListFromAttrRes(tintAttrRes, context))
+        // Work around the bug that GradientDrawable didn't actually implement tinting until
+        // Lollipop MR1 (API 22).
+        fun getGradientDrawableWithTintAttr(@DrawableRes drawableRes: Int,
+                                            @AttrRes tintAttrRes: Int,
+                                            context: Context): Drawable? {
+            var drawable = AppCompatResources.getDrawable(context, drawableRes)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1
+                && drawable is GradientDrawable) {
+                drawable = DrawableCompat.wrap(drawable)
+                drawable.setTintList(getColorStateListFromAttrRes(tintAttrRes, context))
+            }
+            return drawable
         }
-        return drawable
+    
     }
 }
