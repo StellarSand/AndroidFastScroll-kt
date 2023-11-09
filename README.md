@@ -37,14 +37,38 @@ https://github.com/StellarSand/AndroidFastScroll-kt/assets/68168200/c9fb4ce0-5c0
 
 ## Integration
 
-- **Gradle (Kotlin):**
+#### 1. In `settings.gradle`
+- Kotlin:
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        // .. other stuff ..
+        maven("https://jitpack.io")
+    }
+}
+```
+
+- Groovy:
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        // .. other stuff ..
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+#### 2. In app `build.gradle` 
+- Kotlin:
 ```gradle
 dependencies {
     implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.2")
 }
 ```
 
-- **Gradle (Groovy):**
+- Groovy:
 ```gradle
 dependencies {
     implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.2'
