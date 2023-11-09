@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("maven-publish")
 }
 
 android {
@@ -48,4 +49,21 @@ android {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+}
+
+
+afterEvaluate {
+    android.libraryVariants.forEach { variant ->
+        publishing {
+            publications {
+                create<MavenPublication>(variant.name) {
+                    from(components.findByName(variant.name))
+                    
+                    groupId = "me.StellarSand"
+                    artifactId = "AndroidFastScroll-kt"
+                    version = "v1.0.0"
+                }
+            }
+        }
+    }
 }

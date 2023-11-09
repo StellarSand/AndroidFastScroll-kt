@@ -15,4 +15,4 @@
  */
 
 rootProject.name = "AndroidFastScroll-kt"
-include("library")
+include("AndroidFastScroll-kt")
