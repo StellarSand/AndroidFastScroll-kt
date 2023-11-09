@@ -25,8 +25,13 @@ Fast scroll for Android `RecyclerView`.
 
 
 ## Preview
-<p><img src="preview/default_style.png" width="40%" />
-<img src="preview/MD1_style.png" width="40%" /></p>
+
+https://github.com/StellarSand/AndroidFastScroll-kt/assets/68168200/c9fb4ce0-5c0a-43ad-b9bc-06a611b1e1c4
+
+
+| Default style | Material Design 1 style |
+| - | - |
+| <img src="preview/default_style.png" width="250" /> | <img src="preview/MD1_style.png" width="250" /> |
 
 
 
