@@ -31,7 +31,7 @@ https://github.com/StellarSand/AndroidFastScroll-kt/assets/68168200/c9fb4ce0-5c0
 
 | Default style | Material Design 1 style |
 | - | - |
-| <img src="preview/default_style.png" width="250" /> | <img src="preview/MD1_style.png" width="250" /> |
+| <img src="assets/default_style.png" width="250" /> | <img src="assets/MD1_style.png" width="250" /> |
 
 
 
