@@ -61,7 +61,7 @@ afterEvaluate {
                     
                     groupId = "me.StellarSand"
                     artifactId = "AndroidFastScroll-kt"
-                    version = "v1.0.0"
+                    version = "v1.0.2"
                 }
             }
         }

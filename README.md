@@ -40,14 +40,14 @@ https://github.com/StellarSand/AndroidFastScroll-kt/assets/68168200/c9fb4ce0-5c0
 - **Gradle (Kotlin):**
 ```gradle
 dependencies {
-    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.0")
+    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.2")
 }
 ```
 
 - **Gradle (Groovy):**
 ```gradle
 dependencies {
-    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.0'
+    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.2'
 }
 ```
 
@@ -59,7 +59,7 @@ dependencies {
 FastScrollerBuilder(recyclerView).build()
 ```
 
-- You can also implement [`PopupTextProvider`](library/src/main/java/me/stellarsand/android/fastscroll/PopupTextProvider.kt) in your `RecyclerView.Adapter` to show a popup.
+- You can also implement [`PopupTextProvider`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/PopupTextProvider.kt) in your `RecyclerView.Adapter` to show a popup.
 ```kotlin
 class RvAdapter(
     private val aListViewItems: ArrayList<RvData>
@@ -74,7 +74,7 @@ class RvAdapter(
 }
 ```
 
-- For more customization, please use the methods on [`FastScrollerBuilder`](library/src/main/java/me/stellarsand/android/fastscroll/FastScrollerBuilder.kt). Namely:
+- For more customization, please use the methods on [`FastScrollerBuilder`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/FastScrollerBuilder.kt). Namely:
     - `setViewHelper()` - allows providing a custom `ViewHelper` to support more views.
     - `setPopupTextProvider()` - allows providing a custom `PopupTextProvider` if your `RecyclerView.Adapter` cannot implement that interface.
     - `setPadding()` - allows setting a custom padding for the scrollbar, instead of the padding of the view.
@@ -86,9 +86,9 @@ class RvAdapter(
 
 - The default `ViewHelper` implementation for `RecyclerView` supports both `LinearLayoutManager` and `GridLayoutManager`, but assumes that each item has the same height when calculating scroll, as there's no common way to deal with variable item height. If you know how to measure for scrolling in your specific case, you can provide your own `ViewHelper` implementation and fast scroll will work correctly again.
 
-- If you are using any `RecyclerView.ItemDecoration` that implements `onDrawOver()`, you might be interested in [`FixItemDecorationRecyclerView`](library/src/main/java/me/stellarsand/android/fastscroll/FixItemDecorationRecyclerView.kt) which can fix the drawing order.
+- If you are using any `RecyclerView.ItemDecoration` that implements `onDrawOver()`, you might be interested in [`FixItemDecorationRecyclerView`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/FixItemDecorationRecyclerView.kt) which can fix the drawing order.
 
-- If you are using any other library that makes use of `RecyclerView.OnItemTouchListener` (e.g. `recyclerview-selection`), you might be interested in [`FixOnItemTouchListenerRecyclerView`](library/src/main/java/me/stellarsand/android/fastscroll/FixOnItemTouchListenerRecyclerView.kt) which can correctly handle cancellations when dispatching touch events to listeners. You may also want to configure this library before others so that this library can take precedence in touch event handling.
+- If you are using any other library that makes use of `RecyclerView.OnItemTouchListener` (e.g. `recyclerview-selection`), you might be interested in [`FixOnItemTouchListenerRecyclerView`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/FixOnItemTouchListenerRecyclerView.kt) which can correctly handle cancellations when dispatching touch events to listeners. You may also want to configure this library before others so that this library can take precedence in touch event handling.
 
 
 
