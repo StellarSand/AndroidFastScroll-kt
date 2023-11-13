@@ -31,7 +31,7 @@ abstract class FastScrollNestedScrollView (
     @AttrRes defStyleAttr: Int = 0
 ) : NestedScrollView(context, attrs, defStyleAttr), ViewHelperProvider {
     
-    private val mViewHelper: ViewHelper = ViewHelper()
+    private val mViewHelper = ViewHelper()
     
     init {
         isScrollContainer = true
@@ -49,7 +49,6 @@ abstract class FastScrollNestedScrollView (
         return mViewHelper.onInterceptTouchEvent(event)
     }
     
-    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return mViewHelper.onTouchEvent(event)
     }

@@ -31,9 +31,7 @@ abstract class SimpleViewHelper : FastScroller.ViewHelper {
     }
     
     fun draw(canvas: Canvas) {
-        if (mOnPreDrawListener != null) {
-            mOnPreDrawListener !!.run()
-        }
+        mOnPreDrawListener?.run()
         superDraw(canvas)
     }
     
@@ -43,9 +41,7 @@ abstract class SimpleViewHelper : FastScroller.ViewHelper {
     
     fun onScrollChanged(left: Int, top: Int, oldLeft: Int, oldTop: Int) {
         superOnScrollChanged(left, top, oldLeft, oldTop)
-        if (mOnScrollChangedListener != null) {
-            mOnScrollChangedListener !!.run()
-        }
+        mOnScrollChangedListener?.run()
     }
     
     override fun addOnTouchEventListener(onTouchEvent: Predicate<MotionEvent>) {
@@ -53,30 +49,32 @@ abstract class SimpleViewHelper : FastScroller.ViewHelper {
     }
     
     fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        if (mOnTouchEventListener != null && mOnTouchEventListener !!.test(event)) {
-            val actionMasked = event.actionMasked
-            if (actionMasked != MotionEvent.ACTION_UP
-                && actionMasked != MotionEvent.ACTION_CANCEL) {
-                mListenerInterceptingTouchEvent = true
+        mOnTouchEventListener?.let {
+            if (it.test(event)) {
+                val actionMasked = event.actionMasked
+                if (actionMasked != MotionEvent.ACTION_UP
+                    && actionMasked != MotionEvent.ACTION_CANCEL) {
+                    mListenerInterceptingTouchEvent = true
+                }
+                if (actionMasked != MotionEvent.ACTION_CANCEL) {
+                    val cancelEvent = MotionEvent.obtain(event)
+                    cancelEvent.action = MotionEvent.ACTION_CANCEL
+                    superOnInterceptTouchEvent(cancelEvent)
+                    cancelEvent.recycle()
+                }
+                else {
+                    superOnInterceptTouchEvent(event)
+                }
+                return true
             }
-            if (actionMasked != MotionEvent.ACTION_CANCEL) {
-                val cancelEvent = MotionEvent.obtain(event)
-                cancelEvent.action = MotionEvent.ACTION_CANCEL
-                superOnInterceptTouchEvent(cancelEvent)
-                cancelEvent.recycle()
-            }
-            else {
-                superOnInterceptTouchEvent(event)
-            }
-            return true
         }
         return superOnInterceptTouchEvent(event)
     }
     
     fun onTouchEvent(event: MotionEvent): Boolean {
-        if (mOnTouchEventListener != null) {
+        mOnTouchEventListener?.let {
             if (mListenerInterceptingTouchEvent) {
-                mOnTouchEventListener !!.test(event)
+                it.test(event)
                 val actionMasked = event.actionMasked
                 if (actionMasked == MotionEvent.ACTION_UP
                     || actionMasked == MotionEvent.ACTION_CANCEL) {
@@ -86,7 +84,7 @@ abstract class SimpleViewHelper : FastScroller.ViewHelper {
             }
             else {
                 val actionMasked = event.actionMasked
-                if (actionMasked != MotionEvent.ACTION_DOWN && mOnTouchEventListener !!.test(event)) {
+                if (actionMasked != MotionEvent.ACTION_DOWN && it.test(event)) {
                     if (actionMasked != MotionEvent.ACTION_UP
                         && actionMasked != MotionEvent.ACTION_CANCEL) {
                         mListenerInterceptingTouchEvent = true

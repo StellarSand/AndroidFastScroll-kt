@@ -33,19 +33,21 @@ import kotlin.math.sqrt
 
 internal class DefaultPopupBackground(context: Context) : Drawable() {
     
-    private val mPaint: Paint = Paint()
+    private val mPaint = Paint()
     private val mPaddingStart: Int
     private val mPaddingEnd: Int
     private val mPath = Path()
     private val mTempMatrix = Matrix()
     
     init {
-        mPaint.isAntiAlias = true
-        mPaint.color = Utils.getColorFromAttrRes(android.R.attr.colorControlActivated, context)
-        mPaint.style = Paint.Style.FILL
+        mPaint.apply {
+            isAntiAlias = true
+            color = Utils.getColorFromAttrRes(android.R.attr.colorControlActivated, context)
+            style = Paint.Style.FILL
+        }
         val resources = context.resources
-        mPaddingStart = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_padding_start)
-        mPaddingEnd = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_padding_end)
+        mPaddingStart = resources.getDimensionPixelOffset(R.dimen.afs_default_popup_padding_start)
+        mPaddingEnd = resources.getDimensionPixelOffset(R.dimen.afs_default_popup_padding_end)
     }
     
     override fun draw(canvas: Canvas) {
@@ -95,7 +97,7 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
         pathArcTo(mPath, o1X, r, r, 45f, 45f)
         mPath.close()
         if (needMirroring()) {
-            mTempMatrix.setScale(- 1f, 1f, width / 2, 0f)
+            mTempMatrix.setScale(-1f, 1f, width / 2, 0f)
         }
         else {
             mTempMatrix.reset()

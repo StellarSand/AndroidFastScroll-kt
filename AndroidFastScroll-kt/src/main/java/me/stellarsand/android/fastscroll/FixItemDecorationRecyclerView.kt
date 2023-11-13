@@ -31,24 +31,21 @@ class FixItemDecorationRecyclerView(
 ) : RecyclerView (context, attrs, defStyleAttr) {
     
     override fun dispatchDraw(canvas: Canvas) {
-        run {
-            var i = 0
-            val count = itemDecorationCount
-            while (i < count) {
-                val decor = super.getItemDecorationAt(i) as FixItemDecoration
-                decor.itemDecoration.onDraw(canvas, this, decor.state)
-                ++ i
+        for (i in 0 until itemDecorationCount) {
+            val decor = super.getItemDecorationAt(i) as FixItemDecoration
+            decor.getState()?.let { state ->
+                decor.itemDecoration.onDraw(canvas, this, state)
             }
         }
         super.dispatchDraw(canvas)
-        var i = 0
-        val count = itemDecorationCount
-        while (i < count) {
+        for (i in 0 until itemDecorationCount) {
             val decor = super.getItemDecorationAt(i) as FixItemDecoration
-            decor.itemDecoration.onDrawOver(canvas, this, decor.state)
-            ++ i
+            decor.getState()?.let { state ->
+                decor.itemDecoration.onDrawOver(canvas, this, state)
+            }
         }
     }
+    
     
     override fun addItemDecoration(decor: ItemDecoration, index: Int) {
         super.addItemDecoration(FixItemDecoration(decor), index)
@@ -59,34 +56,38 @@ class FixItemDecorationRecyclerView(
     }
     
     override fun removeItemDecoration(decor: ItemDecoration) {
+        var decorToBeRemoved = decor
         if (decor !is FixItemDecoration) {
             for (i in 0 until itemDecorationCount) {
-                val fixDecor = super.getItemDecorationAt(i) as? FixItemDecoration
-                if (fixDecor?.itemDecoration == decor) {
-                    super.removeItemDecoration(fixDecor)
-                    return
+                val fixDecor = super.getItemDecorationAt(i) as FixItemDecoration
+                if (fixDecor.itemDecoration == decor) {
+                    decorToBeRemoved = fixDecor
+                    break
                 }
             }
         }
-        super.removeItemDecoration(decor)
+        super.removeItemDecoration(decorToBeRemoved)
     }
     
     companion object {
         private class FixItemDecoration(val itemDecoration: ItemDecoration) : ItemDecoration() {
-            lateinit var state: State
     
+            private var _state: State? = null
+            
+            fun getState(): State? = _state
+            
             override fun onDraw(c: Canvas, parent: RecyclerView, state: State) {
-                this.state = state
+                _state = state
             }
-    
+            
             @Deprecated("Deprecated in Java")
             override fun onDraw(c: Canvas, parent: RecyclerView) {}
-    
+            
             override fun onDrawOver(c: Canvas, parent: RecyclerView, state: State) {}
-    
+            
             @Deprecated("Deprecated in Java")
             override fun onDrawOver(c: Canvas, parent: RecyclerView) {}
-        
+            
             override fun getItemOffsets(outRect: Rect, view: View,
                                         parent: RecyclerView, state: State) {
                 itemDecoration.getItemOffsets(outRect, view, parent, state)

@@ -33,7 +33,7 @@ class FastScrollWebView (
     @StyleRes defStyleRes: Int = 0
 ) : WebView(context, attrs, defStyleAttr, defStyleRes), ViewHelperProvider {
     
-    private val mViewHelper: ViewHelper = ViewHelper()
+    private val mViewHelper = ViewHelper()
     
     init {
         isVerticalScrollBarEnabled = false

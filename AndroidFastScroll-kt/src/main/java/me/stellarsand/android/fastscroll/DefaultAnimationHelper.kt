@@ -16,6 +16,7 @@
 
 package me.stellarsand.android.fastscroll
 
+import android.animation.TimeInterpolator
 import android.view.View
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
@@ -34,86 +35,98 @@ class DefaultAnimationHelper(private val mView: View) : FastScroller.AnimationHe
     private var mShowingScrollbar = true
     private var mShowingPopup = false
     
-    override val isScrollbarAutoHideEnabled: Boolean
-        get() = mScrollbarAutoHideEnabled
-    
-    override val scrollbarAutoHideDelayMillis: Int
-        get() = AUTO_HIDE_SCROLLBAR_DELAY_MILLIS
-    
     override fun showScrollbar(trackView: View, thumbView: View) {
-        if (mShowingScrollbar) {
-            return
+        if (!mShowingScrollbar) {
+            mShowingScrollbar = true
+            
+            animateView(view = trackView,
+                        alpha = 1f,
+                        translationX = 0f,
+                        duration = SHOW_DURATION_MILLIS,
+                        interpolator = SHOW_SCROLLBAR_INTERPOLATOR)
+            
+            animateView(view = thumbView,
+                        alpha = 1f,
+                        translationX = 0f,
+                        duration = SHOW_DURATION_MILLIS,
+                        interpolator = SHOW_SCROLLBAR_INTERPOLATOR)
         }
-        mShowingScrollbar = true
-        
-        trackView.animate()
-            .alpha(1f)
-            .translationX(0f)
-            .setDuration(SHOW_DURATION_MILLIS)
-            .setInterpolator(SHOW_SCROLLBAR_INTERPOLATOR)
-            .start()
-        thumbView.animate()
-            .alpha(1f)
-            .translationX(0f)
-            .setDuration(SHOW_DURATION_MILLIS)
-            .setInterpolator(SHOW_SCROLLBAR_INTERPOLATOR)
-            .start()
     }
     
     override fun hideScrollbar(trackView: View, thumbView: View) {
-        if (!mShowingScrollbar) {
-            return
+        if (mShowingScrollbar) {
+            mShowingScrollbar = false
+            val isLayoutRtl = mView.layoutDirection == View.LAYOUT_DIRECTION_RTL
+            val width = trackView.width.coerceAtLeast(thumbView.width).toFloat()
+            val translationX: Float =
+                if (isLayoutRtl) {
+                    if (trackView.left == 0) - width else 0f
+                }
+                else {
+                    if (trackView.right == mView.width) width else 0f
+                }
+            
+            animateView(view = trackView,
+                        alpha = 0f,
+                        translationX = translationX,
+                        duration = HIDE_DURATION_MILLIS,
+                        interpolator = HIDE_SCROLLBAR_INTERPOLATOR)
+            
+            animateView(view = thumbView,
+                        alpha = 0f,
+                        translationX = translationX,
+                        duration = HIDE_DURATION_MILLIS,
+                        interpolator = HIDE_SCROLLBAR_INTERPOLATOR)
         }
-        mShowingScrollbar = false
-        
-        val isLayoutRtl = mView.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        val width = trackView.width.coerceAtLeast(thumbView.width).toFloat()
-        val translationX: Float =
-            if (isLayoutRtl) {
-                if (trackView.left == 0) -width else 0f
-            }
-            else {
-                if (trackView.right == mView.width) width else 0f
-            }
-        trackView.animate()
-            .alpha(0f)
-            .translationX(translationX)
-            .setDuration(HIDE_DURATION_MILLIS)
-            .setInterpolator(HIDE_SCROLLBAR_INTERPOLATOR)
-            .start()
-        thumbView.animate()
-            .alpha(0f)
-            .translationX(translationX)
-            .setDuration(HIDE_DURATION_MILLIS)
-            .setInterpolator(HIDE_SCROLLBAR_INTERPOLATOR)
-            .start()
     }
+    
+    override val isScrollbarAutoHideEnabled: Boolean
+        get() = mScrollbarAutoHideEnabled
     
     fun setScrollbarAutoHideEnabled(enabled: Boolean) {
         mScrollbarAutoHideEnabled = enabled
     }
     
+    override val scrollbarAutoHideDelayMillis: Int
+        get() = AUTO_HIDE_SCROLLBAR_DELAY_MILLIS
+    
     override fun showPopup(popupView: View) {
-        if (mShowingPopup) {
-            return
+        if (!mShowingPopup) {
+            mShowingPopup = true
+            animatePopupView(popupView = popupView,
+                             alpha = 1f,
+                             duration = SHOW_DURATION_MILLIS)
         }
-        mShowingPopup = true
-        
-        popupView.animate()
-            .alpha(1f)
-            .setDuration(SHOW_DURATION_MILLIS)
-            .start()
     }
     
     override fun hidePopup(popupView: View) {
-        if (!mShowingPopup) {
-            return
+        if (mShowingPopup) {
+            mShowingPopup = false
+            animatePopupView(popupView = popupView,
+                             alpha = 0f,
+                             duration = HIDE_DURATION_MILLIS)
         }
-        mShowingPopup = false
-        
+    }
+    
+    private fun animateView(view: View,
+                            alpha: Float,
+                            translationX: Float,
+                            duration: Long,
+                            interpolator: TimeInterpolator) {
+        view.animate()
+            .alpha(alpha)
+            .translationX(translationX)
+            .setDuration(duration)
+            .setInterpolator(interpolator)
+            .start()
+    }
+    
+    private fun animatePopupView(popupView: View,
+                                 alpha: Float,
+                                 duration: Long) {
         popupView.animate()
-            .alpha(0f)
-            .setDuration(HIDE_DURATION_MILLIS)
+            .alpha(alpha)
+            .setDuration(duration)
             .start()
     }
 }

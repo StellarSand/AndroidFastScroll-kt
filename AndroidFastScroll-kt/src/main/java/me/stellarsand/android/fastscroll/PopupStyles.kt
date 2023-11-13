@@ -26,53 +26,57 @@ import androidx.core.util.Consumer
 class PopupStyles {
     
     companion object {
-    
-        val MD1 = Consumer { popupView: TextView ->
-            val resources = popupView.resources
-            val minimumSize = resources.getDimensionPixelSize(R.dimen.afs_popup_min_size)
-            popupView.minimumWidth = minimumSize
-            popupView.minimumHeight = minimumSize
-            val layoutParams = popupView.layoutParams as FrameLayout.LayoutParams
-            layoutParams.gravity = Gravity.RIGHT or Gravity.CENTER_VERTICAL
-            layoutParams.marginEnd = resources.getDimensionPixelOffset(R.dimen.afs_popup_margin_end)
-            popupView.layoutParams = layoutParams
-            val context = popupView.context
-            popupView.background = AutoMirrorDrawable(Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_popup_background,
-                                                                                            android.R.attr.colorControlActivated,
-                                                                                            context) !!)
-            popupView.ellipsize = TextUtils.TruncateAt.MIDDLE
-            popupView.gravity = Gravity.CENTER
-            popupView.includeFontPadding = false
-            popupView.isSingleLine = true
-            popupView.setTextColor(Utils.getColorFromAttrRes(android.R.attr.textColorPrimaryInverse,
-                                                             context))
-            popupView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(
-                R.dimen.afs_popup_text_size).toFloat())
+        
+        private fun TextView.applyCommonStyles() {
+            val context = this.context
+            this.apply {
+                ellipsize = TextUtils.TruncateAt.MIDDLE
+                gravity = Gravity.CENTER
+                includeFontPadding = false
+                isSingleLine = true
+                setTextColor(Utils.getColorFromAttrRes(android.R.attr.textColorPrimaryInverse, context))
+            }
         }
-    
-        val DEFAULT = Consumer { popupView: TextView ->
-            val resources = popupView.resources
-            popupView.minimumWidth = resources.getDimensionPixelSize(
-                R.dimen.afs_md2_popup_min_width)
-            popupView.minimumHeight = resources.getDimensionPixelSize(
-                R.dimen.afs_md2_popup_min_height)
-            val layoutParams = popupView.layoutParams as FrameLayout.LayoutParams
-            layoutParams.gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
-            layoutParams.marginEnd = resources.getDimensionPixelOffset(
-                R.dimen.afs_md2_popup_margin_end)
-            popupView.layoutParams = layoutParams
-            val context = popupView.context
-            popupView.background = DefaultPopupBackground(context)
-            popupView.elevation = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_elevation).toFloat()
-            popupView.ellipsize = TextUtils.TruncateAt.MIDDLE
-            popupView.gravity = Gravity.CENTER
-            popupView.includeFontPadding = false
-            popupView.isSingleLine = true
-            popupView.setTextColor(Utils.getColorFromAttrRes(android.R.attr.textColorPrimaryInverse,
-                                                             context))
-            popupView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(
-                R.dimen.afs_md2_popup_text_size).toFloat())
+        
+        private fun TextView.applyLayoutParams(gravity: Int, marginEnd: Int) {
+            val layoutParams = this.layoutParams as FrameLayout.LayoutParams
+            layoutParams.apply {
+                this.gravity = gravity
+                this.marginEnd = marginEnd
+            }
+            this.layoutParams = layoutParams
         }
-    
+        
+        val MD1 =
+            Consumer { popupView: TextView ->
+                val resources = popupView.resources
+                val minimumSize = resources.getDimensionPixelSize(R.dimen.afs_md1_popup_min_size)
+                popupView.apply {
+                    applyLayoutParams(Gravity.RIGHT or Gravity.CENTER_VERTICAL, resources.getDimensionPixelOffset(R.dimen.afs_md1_popup_margin_end))
+                    minimumWidth = minimumSize
+                    minimumHeight = minimumSize
+                    background = AutoMirrorDrawable(Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_popup_background,
+                                                                                          android.R.attr.colorControlActivated, context)!!)
+                    applyCommonStyles()
+                    setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(
+                        R.dimen.afs_md1_popup_text_size).toFloat())
+                }
+            }
+        
+        val DEFAULT =
+            Consumer { popupView: TextView ->
+                val resources = popupView.resources
+                popupView.apply {
+                    applyLayoutParams(Gravity.CENTER_HORIZONTAL or Gravity.TOP, resources.getDimensionPixelOffset(R.dimen.afs_default_popup_margin_end))
+                    minimumWidth = resources.getDimensionPixelSize(R.dimen.afs_default_popup_min_width)
+                    minimumHeight = resources.getDimensionPixelSize(R.dimen.afs_default_popup_min_height)
+                    background = DefaultPopupBackground(context)
+                    elevation = resources.getDimensionPixelOffset(R.dimen.afs_default_popup_elevation).toFloat()
+                    applyCommonStyles()
+                    setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(
+                        R.dimen.afs_default_popup_text_size).toFloat())
+                }
+            }
+        
     }
 }

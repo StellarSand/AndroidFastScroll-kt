@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
-import java.util.Objects
 
 internal class RecyclerViewHelper(
     private val mView: RecyclerView,
@@ -52,6 +51,7 @@ internal class RecyclerViewHelper(
     
     override fun addOnTouchEventListener(onTouchEvent: Predicate<MotionEvent>) {
         mView.addOnItemTouchListener(object : SimpleOnItemTouchListener() {
+            
             override fun onInterceptTouchEvent(recyclerView: RecyclerView,
                                                event: MotionEvent): Boolean {
                 return onTouchEvent.test(event)
@@ -65,27 +65,20 @@ internal class RecyclerViewHelper(
     }
     
     override val scrollRange: Int
-        get() {
-            val itemCount = itemCount
-            if (itemCount == 0) {
-                return 0
-            }
-            val itemHeight = itemHeight
-            return if (itemHeight == 0) {
-                0
-            }
-            else mView.paddingTop + itemCount * itemHeight + mView.paddingBottom
-        }
+        get() =
+            itemHeight.takeIf {
+                it != 0 && itemCount != 0
+            }?.let {
+                mView.paddingTop + itemCount * it + mView.paddingBottom
+            } ?: 0
+    
     override val scrollOffset: Int
-        get() {
-            val firstItemPosition = firstItemPosition
-            if (firstItemPosition == RecyclerView.NO_POSITION) {
-                return 0
-            }
-            val itemHeight = itemHeight
-            val firstItemTop = firstItemOffset
-            return mView.paddingTop + firstItemPosition * itemHeight - firstItemTop
-        }
+        get() =
+            firstItemPosition.takeIf {
+                it != RecyclerView.NO_POSITION
+            }?.let {
+                mView.paddingTop + it * itemHeight - firstItemOffset
+            } ?: 0
     
     override fun scrollTo(offset: Int) {
         // Stop any scroll in progress for RecyclerView.
@@ -101,109 +94,98 @@ internal class RecyclerViewHelper(
     
     override val popupText: CharSequence?
         get() {
-            var popupTextProvider = mPopupTextProvider
-            if (popupTextProvider == null) {
-                val adapter = mView.adapter
-                if (adapter is PopupTextProvider) {
-                    popupTextProvider = adapter
-                }
-            }
-            if (popupTextProvider == null) {
-                return null
-            }
+            val popupTextProvider =
+                mPopupTextProvider ?: mView.adapter.takeIf {
+                    it is PopupTextProvider
+                } as? PopupTextProvider
+            
             val position = getPopupTextPosition()
-            return if (position == RecyclerView.NO_POSITION) {
-                null
-            }
-            else popupTextProvider.getPopupText(mView, position)
-        }
-    private val itemCount: Int
-        get() {
-            val linearLayoutManager = verticalLinearLayoutManager ?: return 0
-            var itemCount = linearLayoutManager.itemCount
-            if (itemCount == 0) {
-                return 0
-            }
-            if (linearLayoutManager is GridLayoutManager) {
-                itemCount = (itemCount - 1) / linearLayoutManager.spanCount + 1
-            }
-            return itemCount
-        }
-    private val itemHeight: Int
-        get() {
-            if (mView.childCount == 0) {
-                return 0
-            }
-            val itemView = mView.getChildAt(0)
-            mView.getDecoratedBoundsWithMargins(itemView, mTempRect)
-            return mTempRect.height()
-        }
-    private val firstItemPosition: Int
-        get() {
-            var position = firstItemAdapterPosition
-            val linearLayoutManager = verticalLinearLayoutManager ?: return RecyclerView.NO_POSITION
-            if (linearLayoutManager is GridLayoutManager) {
-                position /= linearLayoutManager.spanCount
-            }
-            return position
-        }
-    private val firstItemAdapterPosition: Int
-        get() {
-            if (mView.childCount == 0) {
-                return RecyclerView.NO_POSITION
-            }
-            val itemView = mView.getChildAt(0)
-            val linearLayoutManager = verticalLinearLayoutManager ?: return RecyclerView.NO_POSITION
-            return linearLayoutManager.getPosition(itemView)
-        }
-    private val firstItemOffset: Int
-        get() {
-            if (mView.childCount == 0) {
-                return RecyclerView.NO_POSITION
-            }
-            val itemView = mView.getChildAt(0)
-            mView.getDecoratedBoundsWithMargins(itemView, mTempRect)
-            return mTempRect.top
+            
+            return popupTextProvider?.takeIf {
+                position != RecyclerView.NO_POSITION
+            }?.getPopupText(mView, position)
         }
     
+    private val itemCount: Int
+        get() =
+            verticalLinearLayoutManager?.let { layoutManager ->
+                var itemCount = layoutManager.itemCount
+                if (itemCount != 0 && layoutManager is GridLayoutManager) {
+                    itemCount = (itemCount - 1) / layoutManager.spanCount + 1
+                }
+                itemCount
+            } ?: 0
+    
+    private val itemHeight: Int
+        get() =
+            mView.getChildAt(0)?.let { itemView ->
+                mView.getDecoratedBoundsWithMargins(itemView, mTempRect)
+                mTempRect.height()
+            } ?: 0
+    
+    private val firstItemPosition: Int
+        get() =
+            verticalLinearLayoutManager?.let { layoutManager ->
+                var position = firstItemAdapterPosition
+                if (layoutManager is GridLayoutManager) {
+                    position /= layoutManager.spanCount
+                }
+                position
+            } ?: RecyclerView.NO_POSITION
+    
+    private val firstItemAdapterPosition: Int
+        get() =
+            mView.getChildAt(0)?.let { itemView ->
+                verticalLinearLayoutManager?.getPosition(itemView)
+            } ?: RecyclerView.NO_POSITION
+    
+    private val firstItemOffset: Int
+        get() =
+            mView.getChildAt(0)?.let { itemView ->
+                mView.getDecoratedBoundsWithMargins(itemView, mTempRect)
+                mTempRect.top
+            } ?: RecyclerView.NO_POSITION
+    
     private fun scrollToPositionWithOffset(position: Int, offset: Int) {
-        var tempPosition = position
-        var tempOffset = offset
-        val linearLayoutManager = verticalLinearLayoutManager ?: return
-        if (linearLayoutManager is GridLayoutManager) {
-            tempPosition *= linearLayoutManager.spanCount
+        verticalLinearLayoutManager?.let { layoutManager ->
+            var tempPosition = position
+            var tempOffset = offset
+            if (layoutManager is GridLayoutManager) {
+                tempPosition *= layoutManager.spanCount
+            }
+            // LinearLayoutManager actually takes offset from paddingTop instead of top of RecyclerView.
+            tempOffset -= mView.paddingTop
+            layoutManager.scrollToPositionWithOffset(tempPosition, tempOffset)
         }
-        // LinearLayoutManager actually takes offset from paddingTop instead of top of RecyclerView.
-        tempOffset -= mView.paddingTop
-        linearLayoutManager.scrollToPositionWithOffset(tempPosition, tempOffset)
     }
     
     private val verticalLinearLayoutManager: LinearLayoutManager?
-        get() {
-            val layoutManager = mView.layoutManager as? LinearLayoutManager ?: return null
-            return if (layoutManager.orientation != RecyclerView.VERTICAL) {
-                null
+        get() =
+            mView.layoutManager.let {
+                it as? LinearLayoutManager
+            }?.takeIf {
+                it.orientation == RecyclerView.VERTICAL
             }
-            else layoutManager
-        }
     
-    // Fixes wrong popup position
+    // Better popup position
     private fun getPopupTextPosition(): Int {
-        val position: Int = firstItemAdapterPosition
+        val position = firstItemAdapterPosition
         val range = (scrollRange - mView.height).coerceAtLeast(1)
         val offset = scrollOffset.coerceAtMost(range)
-        val linearLayoutManager = verticalLinearLayoutManager
-        if (position == RecyclerView.NO_POSITION) {
-            return RecyclerView.NO_POSITION
-        }
-        val firstVisibleItemPosition = linearLayoutManager!!.findFirstVisibleItemPosition()
-        val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
-        if (firstVisibleItemPosition == RecyclerView.NO_POSITION
-            || lastVisibleItemPosition == RecyclerView.NO_POSITION) {
-            return position
-        }
-        val positionOffset =
-            (lastVisibleItemPosition - firstVisibleItemPosition + 1) * offset / range
-        return (position + positionOffset).coerceAtMost(Objects.requireNonNull(mView.adapter).itemCount - 1)
+        
+        return verticalLinearLayoutManager?.let { layoutManager ->
+            if (position == RecyclerView.NO_POSITION) {
+                return@let RecyclerView.NO_POSITION
+            }
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+            val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+            if (firstVisibleItemPosition == RecyclerView.NO_POSITION
+                || lastVisibleItemPosition == RecyclerView.NO_POSITION) {
+                return@let position
+            }
+            val positionOffset = (lastVisibleItemPosition - firstVisibleItemPosition + 1) * offset / range
+            (position + positionOffset).coerceAtMost((mView.adapter?.itemCount?.minus(1)) ?: RecyclerView.NO_POSITION)
+        } ?: RecyclerView.NO_POSITION
     }
+    
 }

@@ -41,65 +41,70 @@ class FixOnItemTouchListenerRecyclerView(
         mOnItemTouchDispatcher.removeListener(listener)
     }
     
-    private class OnItemTouchDispatcher : OnItemTouchListener {
-        private val mListeners: MutableList<OnItemTouchListener> = ArrayList()
-        private val mTrackingListeners: MutableSet<OnItemTouchListener> = LinkedHashSet()
-        private var mInterceptingListener: OnItemTouchListener? = null
-        fun addListener(listener: OnItemTouchListener) {
-            mListeners.add(listener)
-        }
-        
-        fun removeListener(listener: OnItemTouchListener) {
-            mListeners.remove(listener)
-            mTrackingListeners.remove(listener)
-            if (mInterceptingListener === listener) {
-                mInterceptingListener = null
+    companion object {
+        private class OnItemTouchDispatcher : OnItemTouchListener {
+            
+            private val mListeners: MutableList<OnItemTouchListener> = ArrayList()
+            private val mTrackingListeners: MutableSet<OnItemTouchListener> = LinkedHashSet()
+            private var mInterceptingListener: OnItemTouchListener? = null
+            
+            fun addListener(listener: OnItemTouchListener) {
+                mListeners.add(listener)
             }
-        }
         
-        // @see RecyclerView#findInterceptingOnItemTouchListener
-        override fun onInterceptTouchEvent(recyclerView: RecyclerView,
-                                           event: MotionEvent): Boolean {
-            val action = event.action
-            for (listener in mListeners) {
-                val intercepted = listener.onInterceptTouchEvent(recyclerView, event)
-                if (action == MotionEvent.ACTION_CANCEL) {
-                    mTrackingListeners.remove(listener)
-                    continue
+            fun removeListener(listener: OnItemTouchListener) {
+                mListeners.remove(listener)
+                mTrackingListeners.remove(listener)
+                if (mInterceptingListener == listener) {
+                    mInterceptingListener = null
                 }
-                if (intercepted) {
-                    mTrackingListeners.remove(listener)
-                    event.action = MotionEvent.ACTION_CANCEL
-                    for (trackingListener in mTrackingListeners) {
-                        trackingListener.onInterceptTouchEvent(recyclerView, event)
+            }
+        
+            // @see RecyclerView#findInterceptingOnItemTouchListener
+            override fun onInterceptTouchEvent(recyclerView: RecyclerView,
+                                               event: MotionEvent): Boolean {
+                val action = event.action
+                for (listener in mListeners) {
+                    val intercepted = listener.onInterceptTouchEvent(recyclerView, event)
+                    if (action == MotionEvent.ACTION_CANCEL) {
+                        mTrackingListeners.remove(listener)
+                        continue
                     }
-                    event.action = action
-                    mTrackingListeners.clear()
-                    mInterceptingListener = listener
-                    return true
+                    if (intercepted) {
+                        mTrackingListeners.remove(listener)
+                        event.action = MotionEvent.ACTION_CANCEL
+                        for (trackingListener in mTrackingListeners) {
+                            trackingListener.onInterceptTouchEvent(recyclerView, event)
+                        }
+                        event.action = action
+                        mTrackingListeners.clear()
+                        mInterceptingListener = listener
+                        return true
+                    }
+                    else {
+                        mTrackingListeners.add(listener)
+                    }
                 }
-                else {
-                    mTrackingListeners.add(listener)
+                return false
+            }
+        
+            override fun onTouchEvent(recyclerView: RecyclerView, event: MotionEvent) {
+                if (mInterceptingListener == null) {
+                    return
+                }
+                mInterceptingListener !!.onTouchEvent(recyclerView, event)
+                val action = event.action
+                if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+                    mInterceptingListener = null
                 }
             }
-            return false
-        }
         
-        override fun onTouchEvent(recyclerView: RecyclerView, event: MotionEvent) {
-            if (mInterceptingListener == null) {
-                return
-            }
-            mInterceptingListener !!.onTouchEvent(recyclerView, event)
-            val action = event.action
-            if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                mInterceptingListener = null
-            }
-        }
-        
-        override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-            for (listener in mListeners) {
-                listener.onRequestDisallowInterceptTouchEvent(disallowIntercept)
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                for (listener in mListeners) {
+                    listener.onRequestDisallowInterceptTouchEvent(disallowIntercept)
+                }
             }
         }
     }
+    
 }

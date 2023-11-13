@@ -35,6 +35,7 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
                    padding: Rect?, trackDrawable: Drawable,
                    thumbDrawable: Drawable, popupStyle: Consumer<TextView?>,
                    animationHelper: AnimationHelper) {
+    
     private val mMinTouchTargetSize: Int
     private val mTouchSlop: Int
     private val mView: ViewGroup
@@ -59,8 +60,7 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
     private val mTempRect = Rect()
     
     init {
-        mMinTouchTargetSize = view.resources.getDimensionPixelSize(
-            R.dimen.afs_min_touch_target_size)
+        mMinTouchTargetSize = view.resources.getDimensionPixelSize(R.dimen.afs_min_touch_target_size)
         val context = view.context
         mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
         mView = view
@@ -82,35 +82,42 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
                                                             ViewGroup.LayoutParams.WRAP_CONTENT))
         popupStyle.accept(mPopupView)
         val overlay = mView.overlay
-        overlay.add(mTrackView)
-        overlay.add(mThumbView)
-        overlay.add(mPopupView)
+        overlay.apply {
+            add(mTrackView)
+            add(mThumbView)
+            add(mPopupView)
+        }
         postAutoHideScrollbar()
         mPopupView.setAlpha(0f)
-        mViewHelper.addOnPreDrawListener { onPreDraw() }
-        mViewHelper.addOnScrollChangedListener { onScrollChanged() }
-        mViewHelper.addOnTouchEventListener { event: MotionEvent -> onTouchEvent(event) }
+        mViewHelper.apply {
+            addOnPreDrawListener { onPreDraw() }
+            addOnScrollChangedListener { onScrollChanged() }
+            addOnTouchEventListener { event: MotionEvent -> onTouchEvent(event) }
+        }
     }
     
     fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
-        if (mUserPadding != null && mUserPadding !!.left == left && mUserPadding !!.top == top && mUserPadding !!.right == right && mUserPadding !!.bottom == bottom) {
-            return
-        }
-        if (mUserPadding == null) {
+        mUserPadding?.let {
+            if (it.left == left
+                && it.top == top
+                && it.right == right
+                && it.bottom == bottom) {
+                return
+            }
+        } ?: run {
             mUserPadding = Rect()
         }
+        
         mUserPadding !![left, top, right] = bottom
         mView.invalidate()
     }
     
     private var padding: Rect?
         get() {
-            if (mUserPadding != null) {
-                mTempRect.set(mUserPadding !!)
-            }
-            else {
-                mTempRect[mView.paddingLeft, mView.paddingTop, mView.paddingRight] =
-                    mView.paddingBottom
+            mUserPadding?.let {
+                mTempRect.set(it)
+            } ?: run {
+                mTempRect[mView.paddingLeft, mView.paddingTop, mView.paddingRight] = mView.paddingBottom
             }
             return mTempRect
         }
@@ -118,86 +125,100 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
             if (mUserPadding == padding) {
                 return
             }
-            if (padding != null) {
+            
+            padding?.let {
                 if (mUserPadding == null) {
                     mUserPadding = Rect()
                 }
-                mUserPadding !!.set(padding)
-            }
-            else {
+                mUserPadding !!.set(it)
+            } ?: run {
                 mUserPadding = null
             }
+            
             mView.invalidate()
         }
     
     private fun onPreDraw() {
         updateScrollbarState()
-        mTrackView.visibility =
-            if (mScrollbarEnabled) View.VISIBLE else View.INVISIBLE
-        mThumbView.visibility =
-            if (mScrollbarEnabled) View.VISIBLE else View.INVISIBLE
-        if (! mScrollbarEnabled) {
+        
+        val visibility = if (mScrollbarEnabled) View.VISIBLE else View.INVISIBLE
+        mTrackView.visibility = visibility
+        mThumbView.visibility = visibility
+        
+        if (!mScrollbarEnabled) {
             mPopupView.visibility = View.INVISIBLE
             return
         }
+        
         val layoutDirection = mView.layoutDirection
         mTrackView.layoutDirection = layoutDirection
         mThumbView.layoutDirection = layoutDirection
         mPopupView.layoutDirection = layoutDirection
+        
         val isLayoutRtl = layoutDirection == View.LAYOUT_DIRECTION_RTL
         val viewWidth = mView.width
         val viewHeight = mView.height
-        val padding = padding !!
+        val padding = padding!!
+        
         val trackLeft = if (isLayoutRtl) padding.left else viewWidth - padding.right - mTrackWidth
         layoutView(mTrackView, trackLeft, padding.top, trackLeft + mTrackWidth,
                    (viewHeight - padding.bottom).coerceAtLeast(padding.top))
+        
         val thumbLeft = if (isLayoutRtl) padding.left else viewWidth - padding.right - mThumbWidth
         val thumbTop = padding.top + mThumbOffset
         layoutView(mThumbView, thumbLeft, thumbTop, thumbLeft + mThumbWidth,
                    thumbTop + mThumbHeight)
+        
         val popupText = mViewHelper.popupText
-        val hasPopup = ! TextUtils.isEmpty(popupText)
+        val hasPopup = !TextUtils.isEmpty(popupText)
+        
         mPopupView.visibility = if (hasPopup) View.VISIBLE else View.INVISIBLE
+        
         if (hasPopup) {
             val popupLayoutParams = mPopupView.layoutParams as FrameLayout.LayoutParams
             if (mPopupView.text != popupText) {
                 mPopupView.text = popupText
-                val widthMeasureSpec = ViewGroup.getChildMeasureSpec(
-                    View.MeasureSpec.makeMeasureSpec(viewWidth, View.MeasureSpec.EXACTLY),
-                    padding.left + padding.right + mThumbWidth + popupLayoutParams.leftMargin
-                    + popupLayoutParams.rightMargin, popupLayoutParams.width)
-                val heightMeasureSpec = ViewGroup.getChildMeasureSpec(
-                    View.MeasureSpec.makeMeasureSpec(viewHeight, View.MeasureSpec.EXACTLY),
-                    padding.top + padding.bottom + popupLayoutParams.topMargin
-                    + popupLayoutParams.bottomMargin, popupLayoutParams.height)
+                val widthMeasureSpec =
+                    ViewGroup.getChildMeasureSpec(View.MeasureSpec.makeMeasureSpec(viewWidth, View.MeasureSpec.EXACTLY),
+                                                  padding.left + padding.right + mThumbWidth + popupLayoutParams.leftMargin
+                                                  + popupLayoutParams.rightMargin, popupLayoutParams.width)
+                
+                val heightMeasureSpec =
+                    ViewGroup.getChildMeasureSpec(View.MeasureSpec.makeMeasureSpec(viewHeight, View.MeasureSpec.EXACTLY),
+                                                  padding.top + padding.bottom + popupLayoutParams.topMargin
+                                                  + popupLayoutParams.bottomMargin, popupLayoutParams.height)
+                
                 mPopupView.measure(widthMeasureSpec, heightMeasureSpec)
             }
             val popupWidth = mPopupView.measuredWidth
             val popupHeight = mPopupView.measuredHeight
             val popupLeft =
                 if (isLayoutRtl) padding.left + mThumbWidth + popupLayoutParams.leftMargin
-                else (viewWidth - padding.right - mThumbWidth - popupLayoutParams.rightMargin
-                      - popupWidth)
-            val popupAnchorY: Int = when (popupLayoutParams.gravity and Gravity.HORIZONTAL_GRAVITY_MASK) {
-                Gravity.LEFT -> 0
-                Gravity.CENTER_HORIZONTAL -> popupHeight / 2
-                Gravity.RIGHT -> popupHeight
-                else -> 0
-            }
-            val thumbAnchorY: Int = when (popupLayoutParams.gravity and Gravity.VERTICAL_GRAVITY_MASK) {
-                Gravity.TOP -> mThumbView.paddingTop
-                Gravity.CENTER_VERTICAL -> {
-                    val thumbPaddingTop = mThumbView.paddingTop
-                    thumbPaddingTop + (mThumbHeight - thumbPaddingTop
-                                       - mThumbView.paddingBottom) / 2
+                else (viewWidth - padding.right - mThumbWidth - popupLayoutParams.rightMargin - popupWidth)
+            val popupAnchorY: Int =
+                when (popupLayoutParams.gravity and Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    Gravity.LEFT -> 0
+                    Gravity.CENTER_HORIZONTAL -> popupHeight / 2
+                    Gravity.RIGHT -> popupHeight
+                    else -> 0
                 }
-                
-                Gravity.BOTTOM -> mThumbHeight - mThumbView.paddingBottom
-                else -> mThumbView.paddingTop
-            }
+            val thumbAnchorY: Int =
+                when (popupLayoutParams.gravity and Gravity.VERTICAL_GRAVITY_MASK) {
+                    Gravity.TOP -> mThumbView.paddingTop
+                    Gravity.CENTER_VERTICAL -> {
+                        val thumbPaddingTop = mThumbView.paddingTop
+                        thumbPaddingTop + (mThumbHeight
+                                           - thumbPaddingTop
+                                           - mThumbView.paddingBottom) / 2
+                    }
+                    
+                    Gravity.BOTTOM -> mThumbHeight - mThumbView.paddingBottom
+                    else -> mThumbView.paddingTop
+                }
             val popupTop = MathUtils.clamp(thumbTop + thumbAnchorY - popupAnchorY,
                                            padding.top + popupLayoutParams.topMargin,
                                            viewHeight - padding.bottom - popupLayoutParams.bottomMargin - popupHeight)
+            
             layoutView(mPopupView, popupLeft, popupTop, popupLeft + popupWidth,
                        popupTop + popupHeight)
         }
@@ -218,25 +239,25 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
     
     private fun onScrollChanged() {
         updateScrollbarState()
-        if (! mScrollbarEnabled) {
-            return
+        if (mScrollbarEnabled) {
+            mAnimationHelper.showScrollbar(mTrackView, mThumbView)
+            postAutoHideScrollbar()
         }
-        mAnimationHelper.showScrollbar(mTrackView, mThumbView)
-        postAutoHideScrollbar()
     }
     
     private fun onTouchEvent(event: MotionEvent): Boolean {
-        if (! mScrollbarEnabled) {
+        if (!mScrollbarEnabled) {
             return false
         }
         val eventX = event.x
         val eventY = event.y
-        val padding = padding !!
+        val padding = padding!!
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 mDownX = eventX
                 mDownY = eventY
-                if (mThumbView.alpha > 0 && isInViewTouchTarget(mThumbView, eventX, eventY)) {
+                if (mThumbView.alpha > 0
+                    && isInViewTouchTarget(mThumbView, eventX, eventY)) {
                     mDragStartY = eventY
                     mDragStartThumbOffset = mThumbOffset
                     setDragging(true)
@@ -244,8 +265,9 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
             }
             
             MotionEvent.ACTION_MOVE -> {
-                if (! mDragging && isInViewTouchTarget(mTrackView, mDownX, mDownY) && abs(
-                        eventY - mDownY) > mTouchSlop) {
+                if (!mDragging
+                    && isInViewTouchTarget(mTrackView, mDownX, mDownY)
+                    && abs(eventY - mDownY) > mTouchSlop) {
                     if (isInViewTouchTarget(mThumbView, mDownX, mDownY)) {
                         mDragStartY = mLastY
                         mDragStartThumbOffset = mThumbOffset
@@ -265,14 +287,9 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
             
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> setDragging(false)
         }
+        
         mLastY = eventY
         return mDragging
-    }
-    
-    private fun isInView(view: View, x: Float, y: Float): Boolean {
-        val scrollX = mView.scrollX
-        val scrollY = mView.scrollY
-        return x >= view.left - scrollX && x < view.right - scrollX && y >= view.top - scrollY && y < view.bottom - scrollY
     }
     
     private fun isInViewTouchTarget(view: View, x: Float, y: Float): Boolean {
@@ -290,10 +307,12 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
         if (viewSize >= mMinTouchTargetSize) {
             return position >= viewStart && position < viewEnd
         }
+        
         var touchTargetStart = viewStart - (mMinTouchTargetSize - viewSize) / 2
         if (touchTargetStart < parentStart) {
             touchTargetStart = parentStart
         }
+        
         var touchTargetEnd = touchTargetStart + mMinTouchTargetSize
         if (touchTargetEnd > parentEnd) {
             touchTargetEnd = parentEnd

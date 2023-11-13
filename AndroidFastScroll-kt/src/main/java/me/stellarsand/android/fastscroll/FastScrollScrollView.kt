@@ -33,7 +33,7 @@ class FastScrollScrollView (
     @StyleRes defStyleRes: Int = 0
 ) : ScrollView(context, attrs, defStyleAttr, defStyleRes), ViewHelperProvider {
     
-    private val mViewHelper: ViewHelper = ViewHelper()
+    private val mViewHelper = ViewHelper()
     
     init {
         isVerticalScrollBarEnabled = false

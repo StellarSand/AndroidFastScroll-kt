@@ -37,7 +37,7 @@ internal class Utils {
             return colorStateList?.defaultColor ?: 0
         }
     
-        fun getColorStateListFromAttrRes(@AttrRes attrRes: Int,
+        private fun getColorStateListFromAttrRes(@AttrRes attrRes: Int,
                                          context: Context): ColorStateList? {
             val a = context.obtainStyledAttributes(intArrayOf(attrRes))
             val resId: Int

@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.stellarsand.android.fastscroll.FastScroller.AnimationHelper
 
 class FastScrollerBuilder(private val mView: ViewGroup) {
+    
     private var mViewHelper: FastScroller.ViewHelper? = null
     private var mPopupTextProvider: PopupTextProvider? = null
     private var mPadding: Rect? = null
@@ -59,15 +60,15 @@ class FastScrollerBuilder(private val mView: ViewGroup) {
     }
     
     fun setPadding(padding: Rect?): FastScrollerBuilder {
-        if (padding != null) {
+        padding?.let {
             if (mPadding == null) {
                 mPadding = Rect()
             }
-            mPadding !!.set(padding)
-        }
-        else {
+            mPadding!!.set(it)
+        } ?: run {
             mPadding = null
         }
+        
         return this
     }
     
@@ -90,10 +91,10 @@ class FastScrollerBuilder(private val mView: ViewGroup) {
         val context = mView.context
         mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_track,
                                                                android.R.attr.colorControlNormal,
-                                                               context) !!
+                                                               context)!!
         mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_md1_thumb,
                                                                android.R.attr.colorControlActivated,
-                                                               context) !!
+                                                               context)!!
         mPopupStyle = PopupStyles.MD1
         return this
     }
@@ -102,10 +103,10 @@ class FastScrollerBuilder(private val mView: ViewGroup) {
         val context = mView.context
         mTrackDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_default_track,
                                                                android.R.attr.colorControlNormal,
-                                                               context) !!
+                                                               context)!!
         mThumbDrawable = Utils.getGradientDrawableWithTintAttr(R.drawable.afs_default_thumb,
                                                                android.R.attr.colorControlActivated,
-                                                               context) !!
+                                                               context)!!
         mPopupStyle = PopupStyles.DEFAULT
         return this
     }
@@ -121,48 +122,39 @@ class FastScrollerBuilder(private val mView: ViewGroup) {
     }
     
     fun build(): FastScroller {
-        return FastScroller(mView, orCreateViewHelper, mPadding, mTrackDrawable!!,
-                            mThumbDrawable!!, mPopupStyle!!, orCreateAnimationHelper)
+        return FastScroller(mView, getOrCreateViewHelper(), mPadding, mTrackDrawable!!,
+                            mThumbDrawable!!, mPopupStyle!!, getOrCreateAnimationHelper())
     }
     
-    private val orCreateViewHelper: FastScroller.ViewHelper
-        get() {
-            if (mViewHelper != null) {
-                return mViewHelper as FastScroller.ViewHelper
-            }
-            return when (mView) {
-                is ViewHelperProvider -> {
-                    (mView as ViewHelperProvider).viewHelper
-                }
-                
-                is RecyclerView -> {
-                    RecyclerViewHelper(mView, mPopupTextProvider)
-                }
-                
-                is NestedScrollView -> {
-                    throw UnsupportedOperationException("Please use "
-                                                        + FastScrollNestedScrollView::class.java.simpleName + " instead of "
-                                                        + NestedScrollView::class.java.simpleName + "for fast scroll")
-                }
-                
-                is ScrollView -> {
-                    throw UnsupportedOperationException("Please use "
-                                                        + FastScrollScrollView::class.java.simpleName + " instead of "
-                                                        + ScrollView::class.java.simpleName + "for fast scroll")
-                }
-                
-                is WebView -> {
-                    throw UnsupportedOperationException("Please use "
-                                                        + FastScrollWebView::class.java.simpleName + " instead of "
-                                                        + WebView::class.java.simpleName + "for fast scroll")
-                }
-                
-                else -> {
-                    throw UnsupportedOperationException(mView.javaClass.simpleName
-                                                        + " is not supported for fast scroll")
-                }
-            }
+    private fun getOrCreateViewHelper(): FastScroller.ViewHelper {
+        return mViewHelper ?: when (mView) {
+            is ViewHelperProvider -> (mView as ViewHelperProvider).viewHelper
+            is RecyclerView -> RecyclerViewHelper(mView, mPopupTextProvider)
+            is NestedScrollView -> throwUnsupportedException(NestedScrollView::class.java)
+            is ScrollView -> throwUnsupportedException(ScrollView::class.java)
+            is WebView -> throwUnsupportedException(WebView::class.java)
+            else -> throwUnsupportedException(mView.javaClass)
         }
-    private val orCreateAnimationHelper: AnimationHelper
-        get() = mAnimationHelper ?: DefaultAnimationHelper(mView)
+    }
+    
+    private fun throwUnsupportedException(currentClass: Class<*>): Nothing {
+        val replacementClassName =
+            when (currentClass) {
+                NestedScrollView::class.java -> FastScrollNestedScrollView::class.java.simpleName
+                ScrollView::class.java -> FastScrollScrollView::class.java.simpleName
+                WebView::class.java -> FastScrollWebView::class.java.simpleName
+                else -> throw UnsupportedOperationException("${currentClass.simpleName} is not supported for fast scroll")
+            }
+        
+        throw UnsupportedOperationException("Please use " +
+                                            "$replacementClassName " +
+                                            "instead of " +
+                                            "${currentClass.simpleName} " +
+                                            "for fast scroll")
+    }
+    
+    private fun getOrCreateAnimationHelper(): AnimationHelper {
+        return mAnimationHelper ?: DefaultAnimationHelper(mView)
+    }
+    
 }

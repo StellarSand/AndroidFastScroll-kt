@@ -16,7 +16,6 @@
 
 package me.stellarsand.android.fastscroll
 
-import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
@@ -24,15 +23,14 @@ import android.view.View
 import androidx.appcompat.graphics.drawable.DrawableWrapperCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
-@SuppressLint("RestrictedApi")
 internal class AutoMirrorDrawable(drawable: Drawable) : DrawableWrapperCompat(drawable) {
     
     override fun draw(canvas: Canvas) {
         if (needMirroring()) {
             val centerX = bounds.exactCenterX()
-            canvas.scale(- 1f, 1f, centerX, 0f)
+            canvas.scale(-1f, 1f, centerX, 0f)
             super.draw(canvas)
-            canvas.scale(- 1f, 1f, centerX, 0f)
+            canvas.scale(-1f, 1f, centerX, 0f)
         }
         else {
             super.draw(canvas)
