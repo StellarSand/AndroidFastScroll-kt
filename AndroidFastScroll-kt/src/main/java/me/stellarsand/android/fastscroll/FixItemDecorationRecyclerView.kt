@@ -31,19 +31,13 @@ class FixItemDecorationRecyclerView(
 ) : RecyclerView (context, attrs, defStyleAttr) {
     
     override fun dispatchDraw(canvas: Canvas) {
-        for (i in 0 until itemDecorationCount) {
-            val decor = super.getItemDecorationAt(i) as FixItemDecoration
+        (0 until itemDecorationCount).forEachIndexed { index, _ ->
+            val decor = super.getItemDecorationAt(index) as FixItemDecoration
             decor.getState()?.let { state ->
                 decor.itemDecoration.onDraw(canvas, this, state)
             }
         }
         super.dispatchDraw(canvas)
-        for (i in 0 until itemDecorationCount) {
-            val decor = super.getItemDecorationAt(i) as FixItemDecoration
-            decor.getState()?.let { state ->
-                decor.itemDecoration.onDrawOver(canvas, this, state)
-            }
-        }
     }
     
     
@@ -56,22 +50,21 @@ class FixItemDecorationRecyclerView(
     }
     
     override fun removeItemDecoration(decor: ItemDecoration) {
-        var decorToBeRemoved = decor
-        if (decor !is FixItemDecoration) {
-            for (i in 0 until itemDecorationCount) {
-                val fixDecor = super.getItemDecorationAt(i) as FixItemDecoration
-                if (fixDecor.itemDecoration == decor) {
-                    decorToBeRemoved = fixDecor
-                    break
-                }
+        val decorToBeRemoved =
+            if (decor is FixItemDecoration) decor
+            else {
+                (0 until itemDecorationCount)
+                    .asSequence() // Use a sequence for lazy evaluation
+                    .map { super.getItemDecorationAt(it) as FixItemDecoration }
+                    .firstOrNull { it.itemDecoration == decor }
+                ?: decor // Fallback to the original decor if no match is found
             }
-        }
         super.removeItemDecoration(decorToBeRemoved)
     }
     
     companion object {
         private class FixItemDecoration(val itemDecoration: ItemDecoration) : ItemDecoration() {
-    
+            
             private var _state: State? = null
             
             fun getState(): State? = _state

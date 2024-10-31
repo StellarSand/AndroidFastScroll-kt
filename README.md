@@ -3,7 +3,6 @@
 Fast scroll for Android `RecyclerView`.
 
 - This is a Kotlin rewrite of [AndroidFastScroll](https://github.com/zhanghai/AndroidFastScroll) with better popup position.
-- This is **not** an officially supported Google product.
 
 
 ## Contents
@@ -66,7 +65,7 @@ dependencyResolutionManagement {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.3")
+    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.4")
 }
 ```
 
@@ -74,7 +73,7 @@ dependencies {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.3'
+    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.4'
 }
 ```
 

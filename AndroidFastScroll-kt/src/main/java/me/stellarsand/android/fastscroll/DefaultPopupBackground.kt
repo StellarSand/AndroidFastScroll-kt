@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import androidx.core.graphics.drawable.DrawableCompat
+import me.stellarsand.android.fastscroll.Utils.Companion.getColorFromAttrRes
 import kotlin.math.sqrt
 
 internal class DefaultPopupBackground(context: Context) : Drawable() {
@@ -42,7 +43,7 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
     init {
         mPaint.apply {
             isAntiAlias = true
-            color = Utils.getColorFromAttrRes(android.R.attr.colorControlActivated, context)
+            color = getColorFromAttrRes(android.R.attr.colorControlActivated, context)
             style = Paint.Style.FILL
         }
         val resources = context.resources
@@ -65,7 +66,7 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
         return true
     }
     
-    private fun needMirroring(): Boolean {
+    private fun isMirroringNeeded(): Boolean {
         return DrawableCompat.getLayoutDirection(this) == View.LAYOUT_DIRECTION_RTL
     }
     
@@ -96,7 +97,7 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
         pathArcTo(mPath, o2X, r, r2, - 45f, 90f)
         pathArcTo(mPath, o1X, r, r, 45f, 45f)
         mPath.close()
-        if (needMirroring()) {
+        if (isMirroringNeeded()) {
             mTempMatrix.setScale(-1f, 1f, width / 2, 0f)
         }
         else {
@@ -115,7 +116,7 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
     }
     
     override fun getPadding(padding: Rect): Boolean {
-        if (needMirroring()) {
+        if (isMirroringNeeded()) {
             padding[mPaddingEnd, 0, mPaddingStart] = 0
         }
         else {
@@ -125,14 +126,15 @@ internal class DefaultPopupBackground(context: Context) : Drawable() {
     }
     
     override fun getOutline(outline: Outline) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ! mPath.isConvex) {
+        if (Build.VERSION.SDK_INT < 29 && ! mPath.isConvex) {
             // The outline path must be convex before Q, but we may run into floating point error
             // caused by calculation involving sqrt(2) or OEM implementation difference, so in this
             // case we just omit the shadow instead of crashing.
             super.getOutline(outline)
             return
         }
-        outline.setConvexPath(mPath)
+        if (Build.VERSION.SDK_INT >= 30) outline.setPath(mPath)
+        else outline.setConvexPath(mPath)
     }
     
 }

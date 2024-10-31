@@ -33,7 +33,7 @@ import kotlin.math.abs
 
 class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
                    padding: Rect?, trackDrawable: Drawable,
-                   thumbDrawable: Drawable, popupStyle: Consumer<TextView?>,
+                   thumbDrawable: Drawable, popupStyle: Consumer<TextView>,
                    animationHelper: AnimationHelper) {
     
     private val mMinTouchTargetSize: Int

@@ -44,14 +44,14 @@ class FixOnItemTouchListenerRecyclerView(
     companion object {
         private class OnItemTouchDispatcher : OnItemTouchListener {
             
-            private val mListeners: MutableList<OnItemTouchListener> = ArrayList()
-            private val mTrackingListeners: MutableSet<OnItemTouchListener> = LinkedHashSet()
+            private val mListeners = arrayListOf<OnItemTouchListener>()
+            private val mTrackingListeners = mutableSetOf<OnItemTouchListener>()
             private var mInterceptingListener: OnItemTouchListener? = null
             
             fun addListener(listener: OnItemTouchListener) {
                 mListeners.add(listener)
             }
-        
+            
             fun removeListener(listener: OnItemTouchListener) {
                 mListeners.remove(listener)
                 mTrackingListeners.remove(listener)
@@ -59,22 +59,22 @@ class FixOnItemTouchListenerRecyclerView(
                     mInterceptingListener = null
                 }
             }
-        
+            
             // @see RecyclerView#findInterceptingOnItemTouchListener
             override fun onInterceptTouchEvent(recyclerView: RecyclerView,
                                                event: MotionEvent): Boolean {
                 val action = event.action
-                for (listener in mListeners) {
+                mListeners.forEach { listener ->
                     val intercepted = listener.onInterceptTouchEvent(recyclerView, event)
                     if (action == MotionEvent.ACTION_CANCEL) {
                         mTrackingListeners.remove(listener)
-                        continue
+                        return@forEach
                     }
                     if (intercepted) {
                         mTrackingListeners.remove(listener)
                         event.action = MotionEvent.ACTION_CANCEL
-                        for (trackingListener in mTrackingListeners) {
-                            trackingListener.onInterceptTouchEvent(recyclerView, event)
+                        mTrackingListeners.forEach {
+                            it.onInterceptTouchEvent(recyclerView, event)
                         }
                         event.action = action
                         mTrackingListeners.clear()
@@ -87,21 +87,20 @@ class FixOnItemTouchListenerRecyclerView(
                 }
                 return false
             }
-        
+            
             override fun onTouchEvent(recyclerView: RecyclerView, event: MotionEvent) {
-                if (mInterceptingListener == null) {
-                    return
-                }
-                mInterceptingListener !!.onTouchEvent(recyclerView, event)
-                val action = event.action
-                if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                    mInterceptingListener = null
+                mInterceptingListener?.let {
+                    it.onTouchEvent(recyclerView, event)
+                    val action = event.action
+                    if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+                        mInterceptingListener = null
+                    }
                 }
             }
-        
+            
             override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-                for (listener in mListeners) {
-                    listener.onRequestDisallowInterceptTouchEvent(disallowIntercept)
+                mListeners.forEach {
+                    it.onRequestDisallowInterceptTouchEvent(disallowIntercept)
                 }
             }
         }

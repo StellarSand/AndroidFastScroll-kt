@@ -26,7 +26,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 internal class AutoMirrorDrawable(drawable: Drawable) : DrawableWrapperCompat(drawable) {
     
     override fun draw(canvas: Canvas) {
-        if (needMirroring()) {
+        if (isMirroringNeeded()) {
             val centerX = bounds.exactCenterX()
             canvas.scale(-1f, 1f, centerX, 0f)
             super.draw(canvas)
@@ -46,13 +46,13 @@ internal class AutoMirrorDrawable(drawable: Drawable) : DrawableWrapperCompat(dr
         return true
     }
     
-    private fun needMirroring(): Boolean {
+    private fun isMirroringNeeded(): Boolean {
         return DrawableCompat.getLayoutDirection(this) == View.LAYOUT_DIRECTION_RTL
     }
     
     override fun getPadding(padding: Rect): Boolean {
         val hasPadding = super.getPadding(padding)
-        if (needMirroring()) {
+        if (isMirroringNeeded()) {
             val paddingStart = padding.left
             val paddingEnd = padding.right
             padding.left = paddingEnd
