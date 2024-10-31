@@ -20,10 +20,6 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-kotlin {
-    jvmToolchain(21)
-}
-
 android {
     namespace = "me.stellarsand.android.fastscroll"
     compileSdk = 35
@@ -37,6 +33,15 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+    
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
