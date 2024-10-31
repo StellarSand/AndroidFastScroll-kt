@@ -15,16 +15,17 @@
 #
 
 [versions]
-androidGradle = "8.7.1"
+androidBuildGradle = "8.7.1"
 androidKotlin = "2.0.21" # https://github.com/JetBrains/kotlin/releases/latest (latest version is not auto detected)
 appcompat = "1.7.0"
 recyclerview = "1.3.2"
 
 [libraries]
+android-build-gradle = { module = "com.android.tools.build:gradle", version.ref = "androidBuildGradle" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 
 [plugins]
-android-library = { id = "com.android.library", version.ref = "androidGradle" }
+android-library = { id = "com.android.library" }
 android-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "androidKotlin" }
 maven-publish = { id = "maven-publish" }
