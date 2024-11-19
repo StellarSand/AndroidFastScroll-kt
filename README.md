@@ -65,7 +65,7 @@ dependencyResolutionManagement {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.4")
+    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.8")
 }
 ```
 
@@ -73,7 +73,7 @@ dependencies {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.4'
+    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.8'
 }
 ```
 
@@ -85,7 +85,7 @@ dependencies {
 FastScrollerBuilder(recyclerView).build()
 ```
 
-- You can also implement [`PopupTextProvider`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/PopupTextProvider.kt) in your `RecyclerView.Adapter` to show a popup.
+- To show a popup, implement [`PopupTextProvider`](AndroidFastScroll-kt/src/main/java/me/stellarsand/android/fastscroll/PopupTextProvider.kt) in your `RecyclerView.Adapter`.
 ```kotlin
 class RvAdapter(
   private val aListViewItems: ArrayList<RvData>
