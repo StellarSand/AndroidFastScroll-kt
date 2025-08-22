@@ -349,6 +349,7 @@ class FastScroller(view: ViewGroup, viewHelper: ViewHelper,
             mView.parent.requestDisallowInterceptTouchEvent(true)
         }
         mTrackView.isPressed = mDragging
+        mThumbView.isPressed = mDragging
         if (mDragging) {
             cancelAutoHideScrollbar()
             mAnimationHelper.showScrollbar(mTrackView, mThumbView)
