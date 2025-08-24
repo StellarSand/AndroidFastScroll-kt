@@ -1,8 +1,8 @@
 # AndroidFastScroll-kt
 
-Fast scroll for Android `RecyclerView`.
+Fast scroll for Android `RecyclerView`.Add listener for mThumbView state changes
 
-- This is a Kotlin rewrite of [AndroidFastScroll](https://github.com/zhanghai/AndroidFastScroll) with better popup position.
+- This is a fork of [AndroidFastScroll-kt](https://github.com/StellarSand/AndroidFastScroll-kt).
 
 
 ## Contents
@@ -65,7 +65,7 @@ dependencyResolutionManagement {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation("com.github.StellarSand:AndroidFastScroll-kt:v1.0.8")
+    implementation("com.github.jahirxtrap:AndroidFastScroll-kt:1.0.9")
 }
 ```
 
@@ -73,7 +73,7 @@ dependencies {
 ```gradle
 dependencies {
     // .. other stuff ..
-    implementation 'com.github.StellarSand:AndroidFastScroll-kt:v1.0.8'
+    implementation 'com.github.jahirxtrap:AndroidFastScroll-kt:1.0.9'
 }
 ```
 
@@ -119,4 +119,4 @@ class RvAdapter(
 
 
 ## License
-This project is licensed under the terms of [Apache v2.0 license](https://github.com/StellarSand/AndroidFastScroll-kt/blob/main/LICENSE).
+This project is licensed under the terms of [Apache v2.0 license](https://github.com/jahirxtrap/AndroidFastScroll-kt/blob/main/LICENSE).
